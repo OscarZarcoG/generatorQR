@@ -3,7 +3,7 @@
   command = "cd generatorQR && python manage.py collectstatic --noinput"
 
 [build.environment]
-  PYTHON_VERSION = "3.11"
+  PYTHON_VERSION = "3.12.4"
   DJANGO_SETTINGS_MODULE = "generatorQR.settings"
 
 [[headers]]
