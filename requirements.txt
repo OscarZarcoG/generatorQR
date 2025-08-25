@@ -9,7 +9,7 @@ django-filter==24.2
 
 # Generación de QR
 qrcode[pil]==7.4.2
-pillow==10.3.0
+pillow==10.4.0  # Versión actualizada
 
 # Utilidades
 requests==2.31.0
