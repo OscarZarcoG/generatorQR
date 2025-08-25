@@ -1,10 +1,11 @@
 [build]
   publish = "generatorQR/static"
-  command = "cd generatorQR && python manage.py collectstatic --noinput"
+  command = "pip install -r requirements.txt && cd generatorQR && python manage.py collectstatic --noinput"
 
 [build.environment]
-  PYTHON_VERSION = "3.12.4"
+  PYTHON_VERSION = "3.11"
   DJANGO_SETTINGS_MODULE = "generatorQR.settings"
+
 
 [[headers]]
   for = "/*"
