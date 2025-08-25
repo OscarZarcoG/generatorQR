@@ -3,26 +3,8 @@
   command = "cd generatorQR && python manage.py collectstatic --noinput"
 
 [build.environment]
-  PYTHON_VERSION = "3.12"
+  PYTHON_VERSION = "3.11"
   DJANGO_SETTINGS_MODULE = "generatorQR.settings"
-
-[[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/django/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/admin/*"
-  to = "/.netlify/functions/django/:splat"
-  status = 200
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-
-[functions]
-  directory = "netlify/functions"
 
 [[headers]]
   for = "/*"
