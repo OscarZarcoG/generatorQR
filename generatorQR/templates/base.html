@@ -1,0 +1,129 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QRZar {% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'assets/logo.png' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            'DEFAULT': '#797FF2',
+                            'light': '#9B9FF5',
+                            'dark': '#5A61EF',
+                            50: '#F4F4FE',
+                            100: '#E8E9FD',
+                            200: '#D1D3FB',
+                            300: '#BABDF9',
+                            400: '#A3A7F7',
+                            500: '#797FF2',
+                            600: '#5A61EF',
+                            700: '#3B43EC',
+                            800: '#2A31D4',
+                            900: '#1E23A5'
+                        },
+                        secondary: {
+                            'DEFAULT': '#0396A6',
+                            'light': '#1BBFBF',
+                            'dark': '#03A6A6',
+                            50: '#E6F9FA',
+                            100: '#CCF3F5',
+                            200: '#99E7EB',
+                            300: '#66DBE1',
+                            400: '#33CFD7',
+                            500: '#1BBFBF',
+                            600: '#0396A6',
+                            700: '#03A6A6',
+                            800: '#027A87',
+                            900: '#025D68'
+                        },
+                        accent: {
+                            'DEFAULT': '#F25C5C',
+                            'light': '#F57C7C',
+                            'dark': '#EF3C3C',
+                            50: '#FEF2F2',
+                            100: '#FDE5E5',
+                            200: '#FBCBCB',
+                            300: '#F9B1B1',
+                            400: '#F79797',
+                            500: '#F25C5C',
+                            600: '#EF3C3C',
+                            700: '#EC1C1C',
+                            800: '#C41616',
+                            900: '#9C1111'
+                        },
+                        neutral: {
+                            'DEFAULT': '#0D0D0D',
+                            'light': '#C4F2EE',
+                            'dark': '#000000',
+                            50: '#C4F2EE',
+                            100: '#B0EEEA',
+                            200: '#9CEAE5',
+                            300: '#88E6E0',
+                            400: '#74E2DB',
+                            500: '#60DED6',
+                            600: '#4CDAD1',
+                            700: '#38D6CC',
+                            800: '#24D2C7',
+                            900: '#0D0D0D'
+                        },
+                        // Mantener WhatsApp para funcionalidad específica
+                        'whatsapp': '#25D366',
+                        'whatsapp-dark': '#128C7E',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-2">
+                    <img src="{% static 'assets/logo.png' %}" class="w-8 h-8 rounded" alt="Logo">
+                    <h1 class="text-xl font-bold text-gray-800">QRZar</h1>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="{% url 'home' %}" class="text-gray-600 hover:text-primary transition-colors">
+                        <i class="fas fa-home mr-1"></i> Inicio
+                    </a>
+                    <a href="{% url 'qr_generator' %}" class="text-gray-600 hover:text-primary transition-colors">
+                        <i class="fas fa-plus mr-1"></i> Generar QR
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <div class="flex items-center justify-center space-x-2 mb-4">
+                <i class="fab fa-whatsapp text-whatsapp text-2xl"></i>
+                <span class="text-lg font-semibold">Generador de QR para WhatsApp</span>
+            </div>
+            <p class="text-gray-400">Crea códigos QR estáticos que redirigen directamente a WhatsApp con mensajes predeterminados.</p>
+            <p class="text-gray-500 text-sm mt-4">&copy; 2024 QR Generator. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    {% block scripts %}
+    {% endblock %}
+</body>
+</html>

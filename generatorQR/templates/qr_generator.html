@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block title %}QRZar{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Generar Código QR</h1>
+        <p class="text-gray-600">Crea un código QR que redirija directamente a WhatsApp con un mensaje predeterminado</p>
+    </div>
+
+    <div class="grid lg:grid-cols-2 gap-8">
+        <!-- Formulario -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-6 flex items-center">
+                <i class="fas fa-edit text-primary mr-2"></i>
+                Información del QR
+            </h2>
+            
+            <form id="qr-form" class="space-y-4">
+                <div>
+                    <label for="client_name" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre del Cliente *
+                    </label>
+                    <input type="text" id="client_name" name="client_name" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                           placeholder="Ej: Juan Pérez">
+                </div>
+                
+                <div>
+                    <label for="group_name" class="block text-sm font-medium text-gray-700 mb-1">
+                        Nombre del Grupo/Artista *
+                    </label>
+                    <input type="text" id="group_name" name="group_name" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                           placeholder="Ej: Conjunto K Rollo">
+                </div>
+                
+                <div>
+                    <label for="whatsapp_number" class="block text-sm font-medium text-gray-700 mb-1">
+                        Número de WhatsApp *
+                    </label>
+                    <input type="tel" id="whatsapp_number" name="whatsapp_number" required
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                           placeholder="Ej: 5512345678 o 525512345678">
+                    <p class="text-xs text-gray-500 mt-1">Sin espacios ni guiones. Incluye código de país si es necesario.</p>
+                </div>
+                
+                <div>
+                    <label for="whatsapp_message" class="block text-sm font-medium text-gray-700 mb-1">
+                        Mensaje Predeterminado *
+                    </label>
+                    <textarea id="whatsapp_message" name="whatsapp_message" required rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                              placeholder='Hola, necesito información sobre el grupo "Conjunto K Rollo"'></textarea>
+                    <p class="text-xs text-gray-500 mt-1">Este mensaje aparecerá automáticamente cuando escaneen el QR.</p>
+                </div>
+                
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">
+                        Descripción (Opcional)
+                    </label>
+                    <textarea id="description" name="description" rows="2"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                              placeholder="Notas adicionales sobre este QR..."></textarea>
+                </div>
+                
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" id="preview-btn" 
+                            class="flex-1 bg-secondary text-white py-2 px-4 rounded-md hover:bg-secondary-light transition-colors flex items-center justify-center">
+                        <i class="fas fa-eye mr-2"></i>
+                        Vista Previa
+                    </button>
+                    <button type="submit" id="create-btn"
+                            class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        Crear QR
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Preview/Result -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-semibold mb-6 flex items-center">
+                <i class="fas fa-qrcode text-whatsapp mr-2"></i>
+                Código QR
+            </h2>
+            
+            <div id="qr-preview" class="text-center">
+                <div class="bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-8">
+                    <i class="fas fa-qrcode text-6xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-500">El código QR aparecerá aquí</p>
+                    <p class="text-sm text-gray-400 mt-2">Completa el formulario y haz clic en "Vista Previa" o "Crear QR"</p>
+                </div>
+            </div>
+            
+            <!-- QR Actions (hidden initially) -->
+            <div id="qr-actions" class="mt-6 space-y-3 hidden">
+                <div class="flex space-x-3">
+                    <button id="download-btn" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors flex items-center justify-center">
+                        <i class="fas fa-download mr-2"></i>
+                        Descargar QR
+                    </button>
+                    <button id="view-whatsapp-btn" class="flex-1 bg-whatsapp text-white py-2 px-4 rounded-md hover:bg-whatsapp-dark transition-colors flex items-center justify-center">
+                        <i class="fab fa-whatsapp mr-2"></i>
+                        Probar WhatsApp
+                    </button>
+                </div>
+                
+                <div id="qr-info" class="bg-gray-50 p-4 rounded-md text-sm">
+                    <!-- QR info will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Modal -->
+    <div id="success-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-6 max-w-md mx-4">
+            <div class="text-center">
+                <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-2xl text-green-600"></i>
+                </div>
+                <h3 class="text-lg font-semibold mb-2">¡QR Creado Exitosamente!</h3>
+                <p class="text-gray-600 mb-6">Tu código QR ha sido generado y está listo para usar.</p>
+                <div class="flex space-x-3">
+                    <button id="modal-close" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-400 transition-colors">
+                        Cerrar
+                    </button>
+                    <button id="modal-download" class="flex-1 bg-primary text-white py-2 px-4 rounded-md hover:bg-primary-dark transition-colors">
+                        Descargar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentQR = null;
+
+// Referencias a elementos
+const form = document.getElementById('qr-form');
+const previewBtn = document.getElementById('preview-btn');
+const createBtn = document.getElementById('create-btn');
+const qrPreview = document.getElementById('qr-preview');
+const qrActions = document.getElementById('qr-actions');
+const successModal = document.getElementById('success-modal');
+
+// Event listeners
+previewBtn.addEventListener('click', handlePreview);
+form.addEventListener('submit', handleCreate);
+document.getElementById('modal-close').addEventListener('click', () => {
+    successModal.classList.add('hidden');
+    successModal.classList.remove('flex');
+});
+
+// Función para obtener datos del formulario
+function getFormData() {
+    return {
+        client_name: document.getElementById('client_name').value.trim(),
+        group_name: document.getElementById('group_name').value.trim(),
+        whatsapp_number: document.getElementById('whatsapp_number').value.trim(),
+        whatsapp_message: document.getElementById('whatsapp_message').value.trim(),
+        description: document.getElementById('description').value.trim()
+    };
+}
+
+// Validar formulario
+function validateForm(data) {
+    const required = ['client_name', 'group_name', 'whatsapp_number', 'whatsapp_message'];
+    for (let field of required) {
+        if (!data[field]) {
+            alert(`El campo ${field.replace('_', ' ')} es requerido`);
+            return false;
+        }
+    }
+    return true;
+}
+
+// Manejar vista previa
+async function handlePreview() {
+    const data = getFormData();
+    if (!validateForm(data)) return;
+    
+    previewBtn.disabled = true;
+    previewBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando...';
+    
+    try {
+        const response = await axios.post('/api/qr-preview/', data);
+        
+        if (response.data.success) {
+            showQRPreview(response.data.qr_image, response.data.preview_url, data, false);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al generar la vista previa: ' + (error.response?.data?.error || error.message));
+    } finally {
+        previewBtn.disabled = false;
+        previewBtn.innerHTML = '<i class="fas fa-eye mr-2"></i>Vista Previa';
+    }
+}
+
+// Manejar creación
+async function handleCreate(e) {
+    e.preventDefault();
+    
+    const data = getFormData();
+    if (!validateForm(data)) return;
+    
+    createBtn.disabled = true;
+    createBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Creando...';
+    
+    try {
+        const response = await axios.post('/api/qr/', data);
+        currentQR = response.data;
+        
+        // Mostrar QR creado
+        showQRPreview(currentQR.qr_image_url, currentQR.whatsapp_url, data, true);
+        
+        // Mostrar modal de éxito
+        successModal.classList.remove('hidden');
+        successModal.classList.add('flex');
+        
+        // Configurar botón de descarga del modal
+        document.getElementById('modal-download').onclick = () => {
+            window.open(`/api/qr/${currentQR.id}/download/`, '_blank');
+        };
+        
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error al crear el QR: ' + (error.response?.data?.error || error.message));
+    } finally {
+        createBtn.disabled = false;
+        createBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Crear QR';
+    }
+}
+
+// Mostrar preview del QR
+function showQRPreview(imageUrl, whatsappUrl, data, isCreated) {
+    qrPreview.innerHTML = `
+        <div class="text-center">
+            <img src="${imageUrl}" alt="Código QR" class="mx-auto mb-4 border border-gray-200 rounded-lg" style="max-width: 250px;">
+            <p class="text-sm text-gray-600">${isCreated ? 'QR Creado' : 'Vista Previa'}</p>
+        </div>
+    `;
+    
+    // Mostrar información del QR
+    document.getElementById('qr-info').innerHTML = `
+        <div class="space-y-2">
+            <div><strong>Cliente:</strong> ${data.client_name}</div>
+            <div><strong>Grupo:</strong> ${data.group_name}</div>
+            <div><strong>WhatsApp:</strong> ${data.whatsapp_number}</div>
+            <div><strong>Mensaje:</strong> "${data.whatsapp_message}"</div>
+            ${isCreated ? `<div class="text-green-600"><i class="fas fa-check mr-1"></i> QR guardado en la base de datos</div>` : ''}
+        </div>
+    `;
+    
+    // Configurar botones
+    if (isCreated && currentQR) {
+        document.getElementById('download-btn').onclick = () => {
+            window.open(`/api/qr/${currentQR.id}/download/`, '_blank');
+        };
+    } else {
+        document.getElementById('download-btn').onclick = () => {
+            alert('Primero debes crear el QR para poder descargarlo');
+        };
+    }
+    
+    document.getElementById('view-whatsapp-btn').onclick = () => {
+        window.open(whatsappUrl, '_blank');
+    };
+    
+    // Mostrar acciones
+    qrActions.classList.remove('hidden');
+}
+
+// Prellenar mensaje por defecto
+document.addEventListener('DOMContentLoaded', () => {
+    const groupNameInput = document.getElementById('group_name');
+    const messageInput = document.getElementById('whatsapp_message');
+    
+    groupNameInput.addEventListener('input', () => {
+        if (groupNameInput.value && !messageInput.value) {
+            messageInput.value = `Hola, necesito información sobre el grupo "${groupNameInput.value}"`;
+        }
+    });
+});
+</script>
+{% endblock %}

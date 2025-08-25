@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}QRZar{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-gradient-to-r from-primary to-primary-dark text-white rounded-lg p-8 mb-8">
+    <div class="text-center">
+        <i class="fas fa-qrcode text-6xl mb-4"></i>
+        <h1 class="text-4xl font-bold mb-4">Generador de QR para WhatsApp</h1>
+        <p class="text-xl mb-6">Crea códigos QR estáticos que redirigen directamente a WhatsApp con mensajes predeterminados</p>
+        <a href="{% url 'qr_generator' %}" class="bg-white text-primary px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center">
+            <i class="fas fa-plus mr-2"></i>
+            Crear Nuevo QR
+        </a>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="grid md:grid-cols-3 gap-8 mb-12">
+    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="bg-primary text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-infinity text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">QR Permanentes</h3>
+        <p class="text-gray-600">Los códigos QR no tienen fecha de expiración y funcionan indefinidamente</p>
+    </div>
+    
+    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="bg-secondary text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fab fa-whatsapp text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">Redirección Directa</h3>
+        <p class="text-gray-600">Al escanear el QR, los usuarios van directamente a WhatsApp con el mensaje predefinido</p>
+    </div>
+    
+    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+        <div class="bg-accent text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-chart-line text-2xl"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">Estadísticas</h3>
+        <p class="text-gray-600">Rastrea cuántas veces se ha escaneado cada código QR</p>
+    </div>
+</div>
+
+<!-- Recent QR Codes -->
+<div class="bg-white rounded-lg shadow-md p-6">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">Códigos QR Recientes</h2>
+        <a href="{% url 'qr_generator' %}" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark transition-colors">
+            <i class="fas fa-plus mr-1"></i> Nuevo QR
+        </a>
+    </div>
+    
+    <div id="recent-qrs" class="space-y-4">
+        <!-- Los QR recientes se cargarán aquí via JavaScript -->
+        <div class="text-center py-8 text-gray-500">
+            <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+            <p>Cargando códigos QR...</p>
+        </div>
+    </div>
+</div>
+
+<!-- How it works -->
+<div class="mt-12 bg-gray-100 rounded-lg p-8">
+    <h2 class="text-2xl font-bold text-center mb-8">¿Cómo funciona?</h2>
+    <div class="grid md:grid-cols-4 gap-6">
+        <div class="text-center">
+            <div class="bg-whatsapp text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span class="font-bold">1</span>
+            </div>
+            <h4 class="font-semibold mb-2">Crear QR</h4>
+            <p class="text-sm text-gray-600">Ingresa los datos del cliente y el mensaje de WhatsApp</p>
+        </div>
+        
+        <div class="text-center">
+            <div class="bg-whatsapp text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span class="font-bold">2</span>
+            </div>
+            <h4 class="font-semibold mb-2">Descargar</h4>
+            <p class="text-sm text-gray-600">Descarga la imagen del QR en alta calidad</p>
+        </div>
+        
+        <div class="text-center">
+            <div class="bg-whatsapp text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span class="font-bold">3</span>
+            </div>
+            <h4 class="font-semibold mb-2">Imprimir</h4>
+            <p class="text-sm text-gray-600">Imprime el QR en tarjetas de presentación o material promocional</p>
+        </div>
+        
+        <div class="text-center">
+            <div class="bg-whatsapp text-white w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span class="font-bold">4</span>
+            </div>
+            <h4 class="font-semibold mb-2">¡Listo!</h4>
+            <p class="text-sm text-gray-600">Los clientes escanean y van directo a WhatsApp</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Cargar códigos QR recientes
+async function loadRecentQRs() {
+    try {
+        const response = await axios.get('/api/qr/?ordering=-created_at&limit=5');
+        const qrs = response.data.results || response.data;
+        
+        const container = document.getElementById('recent-qrs');
+        
+        if (qrs.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fas fa-qrcode text-4xl mb-4 opacity-50"></i>
+                    <p class="text-lg mb-2">No hay códigos QR creados aún</p>
+                    <p class="text-sm">¡Crea tu primer código QR para comenzar!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = qrs.map(qr => `
+            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div class="flex items-center space-x-4">
+                    <div class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-qrcode"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold">${qr.client_name} - ${qr.group_name}</h4>
+                        <p class="text-sm text-gray-600">Creado: ${new Date(qr.created_at).toLocaleDateString('es-MX')}</p>
+                        <p class="text-sm text-gray-500">${qr.scan_count} escaneos</p>
+                    </div>
+                </div>
+                <div class="flex space-x-2">
+                    <a href="${qr.qr_image_url}" target="_blank" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600 transition-colors">
+                        <i class="fas fa-eye mr-1"></i> Ver
+                    </a>
+                    <a href="/api/qr/${qr.id}/download/" class="bg-whatsapp text-white px-3 py-1 rounded text-sm hover:bg-whatsapp-dark transition-colors">
+                        <i class="fas fa-download mr-1"></i> Descargar
+                    </a>
+                </div>
+            </div>
+        `).join('');
+        
+    } catch (error) {
+        console.error('Error loading QRs:', error);
+        document.getElementById('recent-qrs').innerHTML = `
+            <div class="text-center py-8 text-red-500">
+                <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                <p>Error al cargar los códigos QR</p>
+            </div>
+        `;
+    }
+}
+
+// Cargar QRs al cargar la página
+document.addEventListener('DOMContentLoaded', loadRecentQRs);
+</script>
+{% endblock %}

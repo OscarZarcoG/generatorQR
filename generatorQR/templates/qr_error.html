@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Error - QR no encontrado{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <!-- Error Icon -->
+        <div class="bg-red-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-exclamation-triangle text-3xl text-red-600"></i>
+        </div>
+        
+        <!-- Error Message -->
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Código QR no encontrado</h1>
+        <p class="text-gray-600 mb-6">{{ error|default:"El código QR que estás buscando no existe o ha sido desactivado." }}</p>
+        
+        <!-- Possible Reasons -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-6 text-left">
+            <h3 class="font-semibold text-gray-800 mb-3">Posibles causas:</h3>
+            <ul class="space-y-2 text-sm text-gray-600">
+                <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-gray-400 mt-2 mr-2"></i>
+                    El código QR ha sido desactivado por el administrador
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-gray-400 mt-2 mr-2"></i>
+                    La URL del código QR es incorrecta o está incompleta
+                </li>
+                <li class="flex items-start">
+                    <i class="fas fa-circle text-xs text-gray-400 mt-2 mr-2"></i>
+                    El código QR ha sido eliminado de la base de datos
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'home' %}" 
+               class="bg-whatsapp text-white px-6 py-3 rounded-lg hover:bg-whatsapp-dark transition-colors flex items-center justify-center">
+                <i class="fas fa-home mr-2"></i>
+                Ir al Inicio
+            </a>
+            <a href="{% url 'qr_generator' %}" 
+               class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
+                <i class="fas fa-plus mr-2"></i>
+                Crear Nuevo QR
+            </a>
+        </div>
+        
+        <!-- Contact Info -->
+        <div class="mt-8 pt-6 border-t border-gray-200">
+            <p class="text-sm text-gray-500">
+                Si crees que esto es un error, por favor contacta al administrador del sistema.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
